@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FMS Week 2 Vocabulary Flashcards</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            max-width: 700px;
+            width: 100%;
+        }
+        
+        .header h1 {
+            font-family: 'Crimson Pro', Georgia, serif;
+            font-size: 1.75rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        
+        .header h1:hover {
+            background: #f0f0f0;
+        }
+        
+        .header h1.editing {
+            background: white;
+            border: 2px solid #95a5a6;
+            outline: none;
+        }
+        
+        .edit-hint {
+            font-size: 0.75rem;
+            color: #95a5a6;
+            margin-top: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .header:hover .edit-hint {
+            opacity: 1;
+        }
+        
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .progress {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        .flashcard-container {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 700px;
+            height: 350px;
+            margin-bottom: 25px;
+        }
+        
+        .flashcard {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e8e8e8;
+        }
+        
+        .card-front {
+            background: white;
+        }
+        
+        .card-back {
+            background: white;
+            transform: rotateY(180deg);
+        }
+        
+        .term {
+            font-family: 'Crimson Pro', Georgia, serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: center;
+            letter-spacing: -0.02em;
+        }
+        
+        .definition {
+            font-size: 1.1rem;
+            color: #4a5568;
+            text-align: center;
+            line-height: 1.65;
+            font-weight: 400;
+        }
+        
+        .label {
+            position: absolute;
+            top: 15px;
+            font-size: 0.75rem;
+            color: #95a5a6;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 500;
+        }
+        
+        /* Card transition animations */
+        .card-content-exit {
+            animation: fadeOutSlide 0.15s ease-out forwards;
+        }
+        
+        .card-content-enter {
+            animation: fadeInSlide 0.15s ease-out forwards;
+        }
+        
+        @keyframes fadeOutSlide {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+        }
+        
+        @keyframes fadeInSlide {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            background: white;
+            color: #4a5568;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        
+        button:hover {
+            background: #f7fafc;
+            border-color: #95a5a6;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        }
+        
+        .btn-primary {
+            background: #2c3e50;
+            color: white;
+            border-color: #2c3e50;
+        }
+        
+        .btn-primary:hover {
+            background: #34495e;
+            border-color: #34495e;
+        }
+        
+        .hint {
+            color: #95a5a6;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s;
+            color: #2c3e50;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #7f8c8d;
+            box-shadow: 0 0 0 3px rgba(149, 165, 166, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .knowledge-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        
+        .btn-know,
+        .btn-dont-know {
+            background: white;
+            color: #333;
+            border-color: #e0e0e0;
+        }
+        
+        .btn-know:hover,
+        .btn-dont-know:hover {
+            background: #f8f8f8;
+            border-color: #999;
+        }
+        
+        .mastery-indicator {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            display: flex;
+            gap: 4px;
+        }
+        
+        .mastery-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e8e8e8;
+            transition: background 0.2s;
+        }
+        
+        .mastery-dot.filled {
+            background: #2c3e50;
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #d1d5db;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #2c3e50;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+        
+        .stats {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        /* Settings Modal Styles */
+        .settings-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .settings-overlay.visible {
+            display: flex;
+        }
+        
+        .settings-modal {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            animation: modalSlideIn 0.3s ease-out;
+            border: 1px solid #e8e8e8;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .settings-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            letter-spacing: -0.01em;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #95a5a6;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .close-btn:hover {
+            background: #f5f5f5;
+            color: #4a5568;
+        }
+        
+        .settings-content {
+            padding: 20px 25px;
+            max-height: calc(80vh - 80px);
+            overflow-y: auto;
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-item-full {
+            padding: 20px 0;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .setting-info {
+            flex: 1;
+        }
+        
+        .setting-info label {
+            display: block;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+        
+        .setting-description {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+        
+        .number-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .number-btn {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .number-input input {
+            width: 60px;
+            text-align: center;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #2c3e50;
+        }
+        
+        .settings-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #2c3e50;
+        }
+        
+        .settings-select:focus {
+            outline: none;
+            border-color: #7f8c8d;
+        }
+        
+        .reset-btn {
+            width: 100%;
+            padding: 12px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .reset-btn:hover {
+            background: #c82333;
+        }
+        
+        /* Colorful Mode Styles */
+        body.colorful-mode {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        body.colorful-mode .header h1,
+        body.colorful-mode .progress,
+        body.colorful-mode .hint {
+            color: white;
+        }
+        
+        body.colorful-mode .stats {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        body.colorful-mode button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            box-shadow: none;
+        }
+        
+        body.colorful-mode button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        body.colorful-mode .btn-primary {
+            background: white;
+            color: #667eea;
+            border-color: white;
+        }
+        
+        body.colorful-mode .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        body.colorful-mode .card-face {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        body.colorful-mode .filter-controls span {
+            color: white;
+        }
+        
+        body.colorful-mode .toggle-slider {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        body.colorful-mode input:checked + .toggle-slider {
+            background-color: white;
+        }
+        
+        body.colorful-mode .toggle-slider:before {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        body.colorful-mode .mastery-dot {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        body.colorful-mode .mastery-dot.filled {
+            background: white;
+        }
+        
+        /* Gradient-specific modal backgrounds */
+        body.gradient-purple .settings-modal {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+            backdrop-filter: blur(10px);
+        }
+        
+        body.gradient-ocean .settings-modal {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(0, 147, 233, 0.95) 100%);
+            backdrop-filter: blur(10px);
+        }
+        
+        body.gradient-sunset .settings-modal {
+            background: linear-gradient(135deg, rgba(250, 139, 255, 0.95) 0%, rgba(43, 210, 255, 0.95) 50%, rgba(43, 255, 136, 0.95) 100%);
+            backdrop-filter: blur(10px);
+        }
+        
+        body.gradient-fire .settings-modal {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.95) 0%, rgba(238, 90, 111, 0.95) 50%, rgba(196, 69, 105, 0.95) 100%);
+            backdrop-filter: blur(10px);
+        }
+        
+        body.gradient-forest .settings-modal {
+            background: linear-gradient(135deg, rgba(19, 78, 94, 0.95) 0%, rgba(113, 178, 128, 0.95) 100%);
+            backdrop-filter: blur(10px);
+        }
+        
+        body.gradient-cosmic .settings-modal {
+            background: linear-gradient(135deg, rgba(78, 101, 255, 0.95) 0%, rgba(146, 239, 253, 0.95) 100%);
+            backdrop-filter: blur(10px);
+        }
+        
+        body.colorful-mode .settings-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        body.colorful-mode .settings-header h2 {
+            color: white;
+        }
+        
+        body.colorful-mode .close-btn {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        body.colorful-mode .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        body.colorful-mode .setting-item,
+        body.colorful-mode .setting-item-full {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        body.colorful-mode .setting-info label {
+            color: white;
+        }
+        
+        body.colorful-mode .setting-description {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        body.colorful-mode .settings-select,
+        body.colorful-mode .number-input input {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        
+        body.colorful-mode .settings-select:focus,
+        body.colorful-mode .number-input input:focus {
+            border-color: white;
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        body.colorful-mode .settings-select option {
+            background: #764ba2;
+            color: white;
+        }
+        
+        body.colorful-mode .number-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        
+        body.colorful-mode .number-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        body.colorful-mode .reset-btn {
+            background: rgba(220, 53, 69, 0.9);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        body.colorful-mode .reset-btn:hover {
+            background: rgba(200, 35, 51, 0.95);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        body.colorful-mode .form-group label {
+            color: white;
+        }
+        
+        body.colorful-mode .form-group input,
+        body.colorful-mode .form-group textarea {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        
+        body.colorful-mode .form-group input::placeholder,
+        body.colorful-mode .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        body.colorful-mode .form-group input:focus,
+        body.colorful-mode .form-group textarea:focus {
+            border-color: white;
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        body.colorful-mode .settings-modal .toggle-slider {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+        
+        body.colorful-mode .settings-modal input:checked + .toggle-slider {
+            background-color: white;
+        }
+        
+        /* Gradient-specific toggle slider colors */
+        body.gradient-purple .settings-modal .toggle-slider:before {
+            background: rgba(102, 126, 234, 0.9);
+        }
+        
+        body.gradient-purple .settings-modal input:checked + .toggle-slider:before {
+            background: #667eea;
+        }
+        
+        body.gradient-ocean .settings-modal .toggle-slider:before {
+            background: rgba(0, 147, 233, 0.9);
+        }
+        
+        body.gradient-ocean .settings-modal input:checked + .toggle-slider:before {
+            background: #0093E9;
+        }
+        
+        body.gradient-sunset .settings-modal .toggle-slider:before {
+            background: rgba(250, 139, 255, 0.9);
+        }
+        
+        body.gradient-sunset .settings-modal input:checked + .toggle-slider:before {
+            background: #FA8BFF;
+        }
+        
+        body.gradient-fire .settings-modal .toggle-slider:before {
+            background: rgba(255, 107, 107, 0.9);
+        }
+        
+        body.gradient-fire .settings-modal input:checked + .toggle-slider:before {
+            background: #ff6b6b;
+        }
+        
+        body.gradient-forest .settings-modal .toggle-slider:before {
+            background: rgba(113, 178, 128, 0.9);
+        }
+        
+        body.gradient-forest .settings-modal input:checked + .toggle-slider:before {
+            background: #71B280;
+        }
+        
+        body.gradient-cosmic .settings-modal .toggle-slider:before {
+            background: rgba(146, 239, 253, 0.9);
+        }
+        
+        body.gradient-cosmic .settings-modal input:checked + .toggle-slider:before {
+            background: #92EFFD;
+        }
+        
+        /* Gradient Selector Styles */
+        .gradient-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 15px 0;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        body.colorful-mode .gradient-selector {
+            border-bottom-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .gradient-option {
+            cursor: pointer;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .gradient-option:hover {
+            transform: scale(1.05);
+            border-color: #2c3e50;
+        }
+        
+        body.colorful-mode .gradient-option:hover {
+            border-color: white;
+        }
+        
+        .gradient-option.selected {
+            border-color: #2c3e50;
+            box-shadow: 0 0 0 2px #2c3e50;
+        }
+        
+        body.colorful-mode .gradient-option.selected {
+            border-color: white;
+            box-shadow: 0 0 0 2px white;
+        }
+        
+        .gradient-preview {
+            width: 100%;
+            height: 60px;
+            border-radius: 8px;
+        }
+        
+        /* Edit Cards List Styles */
+        .cards-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .card-list-item {
+            background: #fafafa;
+            border: 1px solid #e8e8e8;
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .card-list-content:hover {
+            opacity: 0.8;
+        }
+        
+        .card-list-item:hover {
+            background: #f0f0f0;
+            border-color: #95a5a6;
+        }
+        
+        .card-list-content {
+            flex: 1;
+            min-width: 0;
+            cursor: pointer;
+        }
+        
+        .card-list-term {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+        
+        .card-list-definition {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .card-list-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .card-list-delete:hover {
+            background: #c82333;
+        }
+        
+        body.colorful-mode .card-list-item {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        body.colorful-mode .card-list-content:hover {
+            opacity: 0.8;
+        }
+        
+        body.colorful-mode .card-list-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        body.colorful-mode .card-list-term {
+            color: white;
+        }
+        
+        body.colorful-mode .card-list-definition {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        body.colorful-mode .card-list-delete {
+            background: rgba(220, 53, 69, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        body.colorful-mode .card-list-delete:hover {
+            background: rgba(200, 35, 51, 0.95);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Gradient backgrounds */
+        body.gradient-purple {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+        }
+        
+        body.gradient-ocean {
+            background: linear-gradient(135deg, #667eea 0%, #0093E9 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+        }
+        
+        body.gradient-sunset {
+            background: linear-gradient(135deg, #FA8BFF 0%, #2BD2FF 50%, #2BFF88 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 10s ease infinite;
+        }
+        
+        body.gradient-fire {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 50%, #c44569 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+        }
+        
+        body.gradient-forest {
+            background: linear-gradient(135deg, #134E5E 0%, #71B280 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+        }
+        
+        body.gradient-cosmic {
+            background: linear-gradient(135deg, #4E65FF 0%, #92EFFD 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 id="pageTitle" contenteditable="false">FMS Week 2: Financial Institutions</h1>
+        <span class="edit-hint">Click to edit</span>
+        <div class="header-controls">
+            <div class="filter-controls">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="showAllToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span>Show mastered cards</span>
+            </div>
+            <div class="stats" id="stats">Learning: 24 | Mastered: 0</div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button id="settingsBtn" style="padding: 10px 12px;" title="Settings">⚙️</button>
+                <button id="editCardsBtn">Edit Cards</button>
+            </div>
+        </div>
+        <div class="progress" id="progress">Card 1 of 24</div>
+    </div>
+    
+    <div class="flashcard-container">
+        <div class="flashcard" id="flashcard">
+            <div class="card-face card-front">
+                <span class="label">TERM</span>
+                <div class="mastery-indicator" id="masteryIndicatorFront">
+                    <div class="mastery-dot"></div>
+                    <div class="mastery-dot"></div>
+                    <div class="mastery-dot"></div>
+                </div>
+                <div class="term" id="term"></div>
+            </div>
+            <div class="card-face card-back">
+                <span class="label">DEFINITION</span>
+                <div class="mastery-indicator" id="masteryIndicatorBack">
+                    <div class="mastery-dot"></div>
+                    <div class="mastery-dot"></div>
+                    <div class="mastery-dot"></div>
+                </div>
+                <div class="definition" id="definition"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="hint">
+        SPACE to flip • ← → navigate • ↑ Know • ↓ Don't Know
+    </div>
+    
+    <div class="controls">
+        <button id="prevBtn">← Previous</button>
+        <button class="btn-primary" id="flipBtn">Flip</button>
+        <button id="nextBtn">Next →</button>
+        <button id="shuffleBtn">Shuffle</button>
+    </div>
+    
+    <div class="knowledge-controls">
+        <button class="btn-know" id="knowBtn">✓ I Know This (↑ or K)</button>
+        <button class="btn-dont-know" id="dontKnowBtn">✗ Don't Know (↓ or D)</button>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-modal">
+            <div class="settings-header">
+                <h2>Settings</h2>
+                <button class="close-btn" id="closeSettingsBtn">×</button>
+            </div>
+            
+            <div class="settings-content">
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Colorful Mode</label>
+                        <span class="setting-description">Enable vibrant gradient background and colors</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="colorfulModeToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-item" id="gradientSetting" style="display: none;">
+                    <div class="setting-info">
+                        <label>Background Gradient</label>
+                        <span class="setting-description">Choose your preferred gradient theme</span>
+                    </div>
+                </div>
+                
+                <div class="gradient-selector" id="gradientSelector" style="display: none;">
+                    <div class="gradient-option" data-gradient="purple" title="Purple Dream">
+                        <div class="gradient-preview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                    </div>
+                    <div class="gradient-option" data-gradient="ocean" title="Ocean Breeze">
+                        <div class="gradient-preview" style="background: linear-gradient(135deg, #667eea 0%, #0093E9 100%);"></div>
+                    </div>
+                    <div class="gradient-option" data-gradient="sunset" title="Sunset Glow">
+                        <div class="gradient-preview" style="background: linear-gradient(135deg, #FA8BFF 0%, #2BD2FF 50%, #2BFF88 100%);"></div>
+                    </div>
+                    <div class="gradient-option" data-gradient="fire" title="Fire & Ice">
+                        <div class="gradient-preview" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 50%, #c44569 100%);"></div>
+                    </div>
+                    <div class="gradient-option" data-gradient="forest" title="Forest Mist">
+                        <div class="gradient-preview" style="background: linear-gradient(135deg, #134E5E 0%, #71B280 100%);"></div>
+                    </div>
+                    <div class="gradient-option" data-gradient="cosmic" title="Cosmic Fusion">
+                        <div class="gradient-preview" style="background: linear-gradient(135deg, #4E65FF 0%, #92EFFD 100%);"></div>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Mastery Threshold</label>
+                        <span class="setting-description">Number of "I know this" marks needed for mastery</span>
+                    </div>
+                    <div class="number-input">
+                        <button class="number-btn" id="decreaseThreshold">−</button>
+                        <input type="number" id="masteryThreshold" min="1" max="10" value="3">
+                        <button class="number-btn" id="increaseThreshold">+</button>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Auto-Advance After Flip</label>
+                        <span class="setting-description">Automatically move to next card after marking know/don't know</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="autoAdvanceToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Animation Speed</label>
+                        <span class="setting-description">Speed of card flip and transition animations</span>
+                    </div>
+                    <select id="animationSpeed" class="settings-select">
+                        <option value="fast">Fast (0.3s)</option>
+                        <option value="normal" selected>Normal (0.5s)</option>
+                        <option value="slow">Slow (0.8s)</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <label>Default Study Mode</label>
+                        <span class="setting-description">Which cards to show by default when starting</span>
+                    </div>
+                    <select id="defaultStudyMode" class="settings-select">
+                        <option value="learning" selected>Learning Cards Only</option>
+                        <option value="all">All Cards</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item-full">
+                    <button class="reset-btn" id="resetProgressBtn">Reset All Progress</button>
+                    <span class="setting-description" style="margin-top: 8px; display: block;">Clear mastery progress for all cards</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Cards Modal -->
+    <div class="settings-overlay" id="editCardsOverlay">
+        <div class="settings-modal">
+            <div class="settings-header">
+                <h2>Edit Cards</h2>
+                <button class="close-btn" id="closeEditCardsBtn">×</button>
+            </div>
+            
+            <div class="settings-content">
+                <button class="btn-primary" id="addNewCardBtn" style="width: 100%; margin-bottom: 20px;">+ Add New Card</button>
+                <div id="cardsList" class="cards-list"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Single Card Modal -->
+    <div class="settings-overlay" id="editSingleCardOverlay">
+        <div class="settings-modal" style="max-width: 600px;">
+            <div class="settings-header">
+                <h2>Edit Flashcard</h2>
+                <button class="close-btn" id="closeEditSingleBtn">×</button>
+            </div>
+            
+            <div class="settings-content">
+                <div class="form-group">
+                    <label for="editTerm">Term</label>
+                    <input type="text" id="editTerm" placeholder="Enter term">
+                </div>
+                <div class="form-group">
+                    <label for="editDefinition">Definition</label>
+                    <textarea id="editDefinition" placeholder="Enter definition"></textarea>
+                </div>
+                <div class="form-buttons">
+                    <button id="cancelEditBtn">Cancel</button>
+                    <button class="btn-primary" id="saveEditBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const flashcards = [
+            {
+                term: "Treasuries",
+                definition: "Negotiable debt of the US government",
+                knowCount: 0
+            },
+            {
+                term: "Subordinated Debt",
+                definition: "Loan or bond with lower repayment priority than other debts during a company's bankruptcy",
+                knowCount: 0
+            },
+            {
+                term: "FDIC",
+                definition: "Government agency that insures bank deposits, supervises financial institutions, and manages the resolution of failed banks",
+                knowCount: 0
+            },
+            {
+                term: "Public Offering",
+                definition: "The sale of securities, such as stock or bonds, by a company to the general public to raise capital",
+                knowCount: 0
+            },
+            {
+                term: "Private Placement",
+                definition: "A non-public offering and sale of securities (like stocks or bonds) to a limited number of sophisticated investors, bypassing the rigorous registration and disclosure requirements of a public offering",
+                knowCount: 0
+            },
+            {
+                term: "Best Efforts",
+                definition: "A contractual obligation to make a diligent and good-faith attempt to achieve a specific goal",
+                knowCount: 0
+            },
+            {
+                term: "Firm Commitment",
+                definition: "A strong and binding promise to perform a specific action under definite terms and conditions within a specified timeframe",
+                knowCount: 0
+            },
+            {
+                term: "IPO",
+                definition: "Initial Public Offering - when a company first sells its shares to the public",
+                knowCount: 0
+            },
+            {
+                term: "Dutch Auction",
+                definition: "A single seller offers an item at a price that starts high and is gradually lowered until a buyer accepts. The first bidder to accept wins, and the price paid is the final bid",
+                knowCount: 0
+            },
+            {
+                term: "IFRS",
+                definition: "International Financial Reporting Standards - accounting standards developed by the IFRS Foundation and IASB, creating a global 'language' for financial reporting",
+                knowCount: 0
+            },
+            {
+                term: "FASB",
+                definition: "Financial Accounting Standards Board - the independent, private-sector organization responsible for setting and improving accounting and financial reporting standards for U.S. businesses and not-for-profit organizations",
+                knowCount: 0
+            },
+            {
+                term: "Banking Book vs Trading Book",
+                definition: "Banking book: assets held for the long term, typically until maturity. Trading book: assets and liabilities intended for active trading to profit from short-term price fluctuations",
+                knowCount: 0
+            },
+            {
+                term: "Moral Hazard",
+                definition: "Lack of incentive to guard against risk where one is protected from its consequences, e.g. by insurance",
+                knowCount: 0
+            },
+            {
+                term: "Adverse Selection",
+                definition: "A market situation driven by asymmetric information, where one party has private information the other lacks, leading to decisions that favor the informed party",
+                knowCount: 0
+            },
+            {
+                term: "Defined Benefit Plan",
+                definition: "Provides a pre-determined, specific monthly benefit for life after retirement",
+                knowCount: 0
+            },
+            {
+                term: "Defined Contribution Plan",
+                definition: "The final retirement benefit depends on total contributions and investment gains or losses, with the employee bearing the investment risk",
+                knowCount: 0
+            },
+            {
+                term: "LIBOR",
+                definition: "The London Inter-Bank Offered Rate",
+                knowCount: 0
+            },
+            {
+                term: "Alpha",
+                definition: "Measures an investment's risk-adjusted performance against a benchmark index, indicating the value added by a portfolio manager's strategic decisions",
+                knowCount: 0
+            },
+            {
+                term: "Systematic Risk",
+                definition: "The risk inherent in the overall market or economy, driven by broad factors that affect all businesses and investments",
+                knowCount: 0
+            },
+            {
+                term: "Provision for Loan Losses",
+                definition: "An expense that a financial institution sets aside to cover potential losses from customers who may default on their loans",
+                knowCount: 0
+            },
+            {
+                term: "Open End Fund",
+                definition: "An investment fund that creates new shares to meet investor demand and redeems existing shares when investors sell, resulting in unlimited shares and a variable asset pool",
+                knowCount: 0
+            },
+            {
+                term: "Closed End Fund",
+                definition: "Raises a fixed amount of capital through an IPO and then trades its shares on a stock exchange, similar to an individual stock",
+                knowCount: 0
+            },
+            {
+                term: "NAV",
+                definition: "Net Asset Value - an investment company's total assets minus its total liabilities",
+                knowCount: 0
+            },
+            {
+                term: "Hedge Fund",
+                definition: "A private, unregistered investment fund that pools money from investors and invests in securities or other assets with the goal of getting positive returns",
+                knowCount: 0
+            }
+        ];
+
+        let currentIndex = 0;
+        let isFlipped = false;
+        let allCards = [...flashcards];
+        let activeCards = [...flashcards];
+        let showMastered = false;
+        
+        // Settings
+        let settings = {
+            masteryThreshold: 3,
+            colorfulMode: false,
+            autoAdvance: true,
+            animationSpeed: 'normal',
+            defaultStudyMode: 'learning',
+            gradient: 'purple',
+            pageTitle: 'FMS Week 2: Financial Institutions'
+        };
+        
+        // Load settings from localStorage
+        const savedSettings = localStorage.getItem('flashcardSettings');
+        if (savedSettings) {
+            settings = { ...settings, ...JSON.parse(savedSettings) };
+        }
+        
+        let editingCardIndex = -1;
+
+        const flashcardEl = document.getElementById('flashcard');
+        const termEl = document.getElementById('term');
+        const definitionEl = document.getElementById('definition');
+        const progressEl = document.getElementById('progress');
+        const statsEl = document.getElementById('stats');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const flipBtn = document.getElementById('flipBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const knowBtn = document.getElementById('knowBtn');
+        const dontKnowBtn = document.getElementById('dontKnowBtn');
+        const showAllToggle = document.getElementById('showAllToggle');
+        const masteryIndicatorFront = document.getElementById('masteryIndicatorFront');
+        const masteryIndicatorBack = document.getElementById('masteryIndicatorBack');
+        const pageTitleEl = document.getElementById('pageTitle');
+        
+        // Settings elements
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        const colorfulModeToggle = document.getElementById('colorfulModeToggle');
+        const masteryThresholdInput = document.getElementById('masteryThreshold');
+        const decreaseThreshold = document.getElementById('decreaseThreshold');
+        const increaseThreshold = document.getElementById('increaseThreshold');
+        const autoAdvanceToggle = document.getElementById('autoAdvanceToggle');
+        const animationSpeedSelect = document.getElementById('animationSpeed');
+        const defaultStudyModeSelect = document.getElementById('defaultStudyMode');
+        const resetProgressBtn = document.getElementById('resetProgressBtn');
+        const gradientSetting = document.getElementById('gradientSetting');
+        const gradientSelector = document.getElementById('gradientSelector');
+        
+        // Edit cards elements
+        const editCardsBtn = document.getElementById('editCardsBtn');
+        const editCardsOverlay = document.getElementById('editCardsOverlay');
+        const closeEditCardsBtn = document.getElementById('closeEditCardsBtn');
+        const cardsList = document.getElementById('cardsList');
+        const addNewCardBtn = document.getElementById('addNewCardBtn');
+        const editSingleCardOverlay = document.getElementById('editSingleCardOverlay');
+        const closeEditSingleBtn = document.getElementById('closeEditSingleBtn');
+        const editTermInput = document.getElementById('editTerm');
+        const editDefinitionInput = document.getElementById('editDefinition');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const saveEditBtn = document.getElementById('saveEditBtn');
+
+        function getActiveCards() {
+            if (showMastered) {
+                return allCards;
+            }
+            return allCards.filter(card => card.knowCount < settings.masteryThreshold);
+        }
+
+        function updateStats() {
+            const learning = allCards.filter(card => card.knowCount < settings.masteryThreshold).length;
+            const mastered = allCards.filter(card => card.knowCount >= settings.masteryThreshold).length;
+            statsEl.textContent = `Learning: ${learning} | Mastered: ${mastered}`;
+        }
+        
+        function saveSettings() {
+            localStorage.setItem('flashcardSettings', JSON.stringify(settings));
+        }
+        
+        function applySettings() {
+            // Remove all gradient classes first
+            document.body.classList.remove('gradient-purple', 'gradient-ocean', 'gradient-sunset', 
+                                          'gradient-fire', 'gradient-forest', 'gradient-cosmic');
+            
+            // Apply colorful mode
+            if (settings.colorfulMode) {
+                document.body.classList.add('colorful-mode');
+                document.body.classList.add(`gradient-${settings.gradient}`);
+                gradientSetting.style.display = 'flex';
+                gradientSelector.style.display = 'grid';
+            } else {
+                document.body.classList.remove('colorful-mode');
+                gradientSetting.style.display = 'none';
+                gradientSelector.style.display = 'none';
+            }
+            
+            // Apply animation speed
+            const speeds = { fast: '0.3s', normal: '0.5s', slow: '0.8s' };
+            flashcardEl.style.transition = `transform ${speeds[settings.animationSpeed]}`;
+            
+            // Update UI controls
+            colorfulModeToggle.checked = settings.colorfulMode;
+            masteryThresholdInput.value = settings.masteryThreshold;
+            autoAdvanceToggle.checked = settings.autoAdvance;
+            animationSpeedSelect.value = settings.animationSpeed;
+            defaultStudyModeSelect.value = settings.defaultStudyMode;
+            showAllToggle.checked = settings.defaultStudyMode === 'all';
+            showMastered = settings.defaultStudyMode === 'all';
+            
+            // Apply page title
+            pageTitleEl.textContent = settings.pageTitle;
+            document.title = settings.pageTitle;
+            
+            // Update gradient selector
+            document.querySelectorAll('.gradient-option').forEach(option => {
+                if (option.dataset.gradient === settings.gradient) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+        }
+        
+        function setupTitleEditing() {
+            pageTitleEl.addEventListener('click', () => {
+                pageTitleEl.contentEditable = 'true';
+                pageTitleEl.classList.add('editing');
+                pageTitleEl.focus();
+                
+                // Select all text
+                const range = document.createRange();
+                range.selectNodeContents(pageTitleEl);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+            });
+            
+            pageTitleEl.addEventListener('blur', () => {
+                pageTitleEl.contentEditable = 'false';
+                pageTitleEl.classList.remove('editing');
+                const newTitle = pageTitleEl.textContent.trim();
+                if (newTitle) {
+                    settings.pageTitle = newTitle;
+                    document.title = newTitle;
+                    saveSettings();
+                } else {
+                    // Restore old title if empty
+                    pageTitleEl.textContent = settings.pageTitle;
+                }
+            });
+            
+            pageTitleEl.addEventListener('keydown', (e) => {
+                if (e.code === 'Enter') {
+                    e.preventDefault();
+                    pageTitleEl.blur();
+                }
+                if (e.code === 'Escape') {
+                    pageTitleEl.textContent = settings.pageTitle;
+                    pageTitleEl.blur();
+                }
+            });
+        }
+        
+        function openSettings() {
+            settingsOverlay.classList.add('visible');
+        }
+        
+        function closeSettings() {
+            settingsOverlay.classList.remove('visible');
+        }
+        
+        function toggleColorfulMode() {
+            settings.colorfulMode = colorfulModeToggle.checked;
+            saveSettings();
+            applySettings();
+        }
+        
+        function updateMasteryThreshold(value) {
+            const threshold = parseInt(value);
+            if (threshold >= 1 && threshold <= 10) {
+                settings.masteryThreshold = threshold;
+                masteryThresholdInput.value = threshold;
+                saveSettings();
+                updateMasteryIndicatorDots();
+                updateStats();
+                activeCards = getActiveCards();
+                if (currentIndex >= activeCards.length && activeCards.length > 0) {
+                    currentIndex = 0;
+                }
+                updateCard();
+            }
+        }
+        
+        function updateMasteryIndicatorDots() {
+            // Clear existing dots
+            masteryIndicatorFront.innerHTML = '';
+            masteryIndicatorBack.innerHTML = '';
+            
+            // Add new dots based on threshold
+            for (let i = 0; i < settings.masteryThreshold; i++) {
+                const dotFront = document.createElement('div');
+                dotFront.className = 'mastery-dot';
+                masteryIndicatorFront.appendChild(dotFront);
+                
+                const dotBack = document.createElement('div');
+                dotBack.className = 'mastery-dot';
+                masteryIndicatorBack.appendChild(dotBack);
+            }
+        }
+        
+        function toggleAutoAdvance() {
+            settings.autoAdvance = autoAdvanceToggle.checked;
+            saveSettings();
+        }
+        
+        function updateAnimationSpeed() {
+            settings.animationSpeed = animationSpeedSelect.value;
+            saveSettings();
+            applySettings();
+        }
+        
+        function updateDefaultStudyMode() {
+            settings.defaultStudyMode = defaultStudyModeSelect.value;
+            saveSettings();
+        }
+        
+        function resetAllProgress() {
+            if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+                allCards.forEach(card => card.knowCount = 0);
+                activeCards = getActiveCards();
+                currentIndex = 0;
+                updateCard();
+            }
+        }
+        
+        function selectGradient(gradient) {
+            settings.gradient = gradient;
+            saveSettings();
+            applySettings();
+        }
+        
+        function openEditCards() {
+            renderCardsList();
+            editCardsOverlay.classList.add('visible');
+        }
+        
+        function closeEditCards() {
+            editCardsOverlay.classList.remove('visible');
+        }
+        
+        function renderCardsList() {
+            cardsList.innerHTML = '';
+            allCards.forEach((card, index) => {
+                const cardItem = document.createElement('div');
+                cardItem.className = 'card-list-item';
+                cardItem.innerHTML = `
+                    <div class="card-list-content">
+                        <div class="card-list-term">${card.term}</div>
+                        <div class="card-list-definition">${card.definition}</div>
+                    </div>
+                    <button class="card-list-delete">Delete</button>
+                `;
+                
+                // Click on the content area to edit
+                const contentArea = cardItem.querySelector('.card-list-content');
+                contentArea.addEventListener('click', () => openEditSingleCard(index));
+                
+                // Click on delete button to delete
+                const deleteBtn = cardItem.querySelector('.card-list-delete');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent opening edit modal
+                    deleteCard(index);
+                });
+                
+                cardsList.appendChild(cardItem);
+            });
+        }
+        
+        function deleteCard(index) {
+            const card = allCards[index];
+            if (confirm(`Delete "${card.term}"?`)) {
+                allCards.splice(index, 1);
+                activeCards = getActiveCards();
+                
+                // Adjust current index if needed
+                if (currentIndex >= activeCards.length && activeCards.length > 0) {
+                    currentIndex = activeCards.length - 1;
+                } else if (activeCards.length === 0) {
+                    currentIndex = 0;
+                }
+                
+                renderCardsList();
+                updateCard();
+            }
+        }
+        
+        function openEditSingleCard(index) {
+            editingCardIndex = index;
+            const card = allCards[index];
+            editTermInput.value = card.term;
+            editDefinitionInput.value = card.definition;
+            editSingleCardOverlay.classList.add('visible');
+            editSingleCardOverlay.querySelector('.settings-header h2').textContent = 'Edit Flashcard';
+        }
+        
+        function closeEditSingleCard() {
+            editSingleCardOverlay.classList.remove('visible');
+            editingCardIndex = -1;
+        }
+        
+        function saveEditedCard() {
+            const term = editTermInput.value.trim();
+            const definition = editDefinitionInput.value.trim();
+            
+            if (!term || !definition) {
+                alert('Please fill in both term and definition');
+                return;
+            }
+            
+            if (editingCardIndex === -1) {
+                // Add new card mode
+                allCards.push({ term, definition, knowCount: 0 });
+                activeCards = getActiveCards();
+            } else {
+                // Edit existing card mode
+                allCards[editingCardIndex].term = term;
+                allCards[editingCardIndex].definition = definition;
+                
+                // Update the display if we're currently viewing this card
+                activeCards = getActiveCards();
+                const currentCard = activeCards[currentIndex];
+                if (currentCard === allCards[editingCardIndex]) {
+                    updateCard();
+                }
+            }
+            
+            renderCardsList();
+            closeEditSingleCard();
+        }
+
+        function updateMasteryIndicator() {
+            if (activeCards.length === 0) return;
+            
+            const card = activeCards[currentIndex];
+            const dotsFront = masteryIndicatorFront.children;
+            const dotsBack = masteryIndicatorBack.children;
+            
+            for (let i = 0; i < settings.masteryThreshold; i++) {
+                if (i < card.knowCount) {
+                    dotsFront[i]?.classList.add('filled');
+                    dotsBack[i]?.classList.add('filled');
+                } else {
+                    dotsFront[i]?.classList.remove('filled');
+                    dotsBack[i]?.classList.remove('filled');
+                }
+            }
+        }
+
+        function updateCard() {
+            activeCards = getActiveCards();
+            
+            if (activeCards.length === 0) {
+                termEl.textContent = 'All cards mastered!';
+                definitionEl.textContent = 'Toggle "Show mastered cards" to review them again';
+                progressEl.textContent = 'No cards to study';
+                masteryIndicatorFront.style.display = 'none';
+                masteryIndicatorBack.style.display = 'none';
+                return;
+            }
+            
+            masteryIndicatorFront.style.display = 'flex';
+            masteryIndicatorBack.style.display = 'flex';
+            
+            // Ensure current index is valid
+            if (currentIndex >= activeCards.length) {
+                currentIndex = 0;
+            }
+            
+            // Add exit animation
+            termEl.classList.add('card-content-exit');
+            definitionEl.classList.add('card-content-exit');
+            
+            // Wait for exit animation, then update content
+            setTimeout(() => {
+                const card = activeCards[currentIndex];
+                termEl.textContent = card.term;
+                definitionEl.textContent = card.definition;
+                progressEl.textContent = `Card ${currentIndex + 1} of ${activeCards.length}`;
+                updateMasteryIndicator();
+                updateStats();
+                
+                // Remove exit and add enter animation
+                termEl.classList.remove('card-content-exit');
+                definitionEl.classList.remove('card-content-exit');
+                termEl.classList.add('card-content-enter');
+                definitionEl.classList.add('card-content-enter');
+                
+                // Clean up enter animation class
+                setTimeout(() => {
+                    termEl.classList.remove('card-content-enter');
+                    definitionEl.classList.remove('card-content-enter');
+                }, 150);
+            }, 150);
+            
+            if (isFlipped) {
+                flashcardEl.classList.remove('flipped');
+                isFlipped = false;
+            }
+        }
+
+        function flipCard() {
+            if (activeCards.length === 0) return;
+            flashcardEl.classList.toggle('flipped');
+            isFlipped = !isFlipped;
+        }
+
+        function nextCard() {
+            if (activeCards.length === 0) return;
+            currentIndex = (currentIndex + 1) % activeCards.length;
+            updateCard();
+        }
+
+        function prevCard() {
+            if (activeCards.length === 0) return;
+            currentIndex = (currentIndex - 1 + activeCards.length) % activeCards.length;
+            updateCard();
+        }
+
+        function shuffleCards() {
+            if (activeCards.length === 0) return;
+            for (let i = activeCards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [activeCards[i], activeCards[j]] = [activeCards[j], activeCards[i]];
+            }
+            currentIndex = 0;
+            updateCard();
+        }
+
+        function markKnow() {
+            if (activeCards.length === 0) return;
+            
+            const card = activeCards[currentIndex];
+            if (card.knowCount < settings.masteryThreshold) {
+                card.knowCount++;
+            }
+            
+            updateMasteryIndicator();
+            updateStats();
+            
+            // Auto-advance if enabled
+            if (settings.autoAdvance) {
+                setTimeout(() => {
+                    nextCard();
+                }, 300);
+            }
+        }
+
+        function markDontKnow() {
+            if (activeCards.length === 0) return;
+            
+            const card = activeCards[currentIndex];
+            card.knowCount = 0;
+            
+            updateMasteryIndicator();
+            updateStats();
+            
+            // Auto-advance if enabled
+            if (settings.autoAdvance) {
+                setTimeout(() => {
+                    nextCard();
+                }, 300);
+            }
+        }
+
+        function toggleShowAll() {
+            showMastered = showAllToggle.checked;
+            const oldCard = activeCards[currentIndex];
+            activeCards = getActiveCards();
+            
+            // Try to maintain position on the same card if possible
+            const newIndex = activeCards.indexOf(oldCard);
+            currentIndex = newIndex !== -1 ? newIndex : 0;
+            
+            updateCard();
+        }
+
+        function showAddCardForm() {
+            // Open edit cards modal first if not already open
+            if (!editCardsOverlay.classList.contains('visible')) {
+                openEditCards();
+            }
+            // Open the single card editor in "add" mode
+            editingCardIndex = -1;
+            editTermInput.value = '';
+            editDefinitionInput.value = '';
+            editSingleCardOverlay.classList.add('visible');
+            // Update the title for add mode
+            editSingleCardOverlay.querySelector('.settings-header h2').textContent = 'Add New Flashcard';
+        }
+
+        // Event listeners
+        flashcardEl.addEventListener('click', flipCard);
+        flipBtn.addEventListener('click', flipCard);
+        nextBtn.addEventListener('click', nextCard);
+        prevBtn.addEventListener('click', prevCard);
+        shuffleBtn.addEventListener('click', shuffleCards);
+        knowBtn.addEventListener('click', markKnow);
+        dontKnowBtn.addEventListener('click', markDontKnow);
+        showAllToggle.addEventListener('change', toggleShowAll);
+        
+        // Settings event listeners
+        settingsBtn.addEventListener('click', openSettings);
+        closeSettingsBtn.addEventListener('click', closeSettings);
+        settingsOverlay.addEventListener('click', (e) => {
+            if (e.target === settingsOverlay) closeSettings();
+        });
+        colorfulModeToggle.addEventListener('change', toggleColorfulMode);
+        masteryThresholdInput.addEventListener('change', (e) => updateMasteryThreshold(e.target.value));
+        decreaseThreshold.addEventListener('click', () => {
+            updateMasteryThreshold(parseInt(masteryThresholdInput.value) - 1);
+        });
+        increaseThreshold.addEventListener('click', () => {
+            updateMasteryThreshold(parseInt(masteryThresholdInput.value) + 1);
+        });
+        autoAdvanceToggle.addEventListener('change', toggleAutoAdvance);
+        animationSpeedSelect.addEventListener('change', updateAnimationSpeed);
+        defaultStudyModeSelect.addEventListener('change', updateDefaultStudyMode);
+        resetProgressBtn.addEventListener('click', resetAllProgress);
+        
+        // Gradient selector event listeners
+        document.querySelectorAll('.gradient-option').forEach(option => {
+            option.addEventListener('click', () => {
+                selectGradient(option.dataset.gradient);
+            });
+        });
+        
+        // Edit cards event listeners
+        editCardsBtn.addEventListener('click', openEditCards);
+        closeEditCardsBtn.addEventListener('click', closeEditCards);
+        editCardsOverlay.addEventListener('click', (e) => {
+            if (e.target === editCardsOverlay) closeEditCards();
+        });
+        addNewCardBtn.addEventListener('click', showAddCardForm);
+        closeEditSingleBtn.addEventListener('click', closeEditSingleCard);
+        editSingleCardOverlay.addEventListener('click', (e) => {
+            if (e.target === editSingleCardOverlay) closeEditSingleCard();
+        });
+        cancelEditBtn.addEventListener('click', closeEditSingleCard);
+        saveEditBtn.addEventListener('click', saveEditedCard);
+        
+        // Enter key to save edited card
+        editDefinitionInput.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.code === 'Enter') {
+                saveEditedCard();
+            }
+        });
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            // Close modals with Escape
+            if (e.code === 'Escape') {
+                if (editSingleCardOverlay.classList.contains('visible')) {
+                    closeEditSingleCard();
+                    return;
+                }
+                if (editCardsOverlay.classList.contains('visible')) {
+                    closeEditCards();
+                    return;
+                }
+                if (settingsOverlay.classList.contains('visible')) {
+                    closeSettings();
+                    return;
+                }
+            }
+            
+            // Don't interfere when modals open or when editing title
+            if (settingsOverlay.classList.contains('visible') ||
+                editCardsOverlay.classList.contains('visible') ||
+                editSingleCardOverlay.classList.contains('visible') ||
+                pageTitleEl.contentEditable === 'true') return;
+            
+            if (e.code === 'Space') {
+                e.preventDefault();
+                flipCard();
+            } else if (e.code === 'ArrowRight') {
+                nextCard();
+            } else if (e.code === 'ArrowLeft') {
+                prevCard();
+            } else if (e.code === 'ArrowUp') {
+                e.preventDefault();
+                markKnow();
+            } else if (e.code === 'ArrowDown') {
+                e.preventDefault();
+                markDontKnow();
+            } else if (e.code === 'KeyK') {
+                markKnow();
+            } else if (e.code === 'KeyD') {
+                markDontKnow();
+            }
+        });
+
+        // Initialize
+        setupTitleEditing();
+        applySettings();
+        updateMasteryIndicatorDots();
+        updateCard();
+    </script>
+</body>
+</html>
