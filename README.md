@@ -2,7 +2,7 @@
 
 A powerful, customizable flashcard application with mastery tracking, multiple themes, and seamless card management. Built with vanilla JavaScript, HTML, and CSS - no dependencies required.
 
-##Access
+## Access
 Site is live at https://ian-menachery.github.io/flashcards/
 
 ## Features
